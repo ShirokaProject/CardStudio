@@ -10,5 +10,6 @@
   <ItemGroup>
     <PackageReference Include="Avalonia.Browser" Version="12.1.2" />
     <ProjectReference Include="../Studio/CardStudio.csproj" />
+    <AvaloniaResource Include="Assets/Fonts/*.otf" />
   </ItemGroup>
 </Project>

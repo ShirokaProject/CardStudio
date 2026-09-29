@@ -18,6 +18,8 @@ dotnet run --project src/Browser/CardStudio.Browser.csproj
 
 打开命令输出的本地 HTTP 地址。发布静态站点可执行 `dotnet publish src/Browser/CardStudio.Browser.csproj -c Release`，然后部署 `src/Browser/bin/Release/net10.0-browser/publish/wwwroot`。推送 `main` 分支的 `src/` 变更时，GitHub Actions 会自动构建并部署浏览器版到 [GitHub Pages](https://shirokaproject.github.io/CardStudio/)；也可从 Actions 手动运行部署工作流。
 
+浏览器版内嵌 [Noto Sans SC](https://github.com/notofonts/noto-cjk/tree/main/Sans/SubsetOTF/SC) 常规和粗体字形，以显示中文界面和卡片内容；字体遵循 [SIL Open Font License 1.1](src/Browser/wwwroot/OFL-NotoSansSC.txt)。这会增加 WASM 下载体积。桌面版仍使用系统字体，因此两端导出的字形可能略有差异。
+
 启动后会打开 `src/Studio/Samples` 中的三文件示例。卡片根节点最好显式设置 `Width` 和 `Height`；DPI 影响导出 PNG 的像素尺寸，右侧预览会按可用空间缩放显示。截图采用与 ShiroBot 宿主相同的尺寸解析、`Viewbox.Stretch.Fill` 放大和 96 DPI 位图渲染流程。宿主使用 Avalonia Headless，桌面和浏览器使用各自平台后端；系统字体不同仍可能导致像素差异。
 
 ## 使用自己的 AXAML 和控件

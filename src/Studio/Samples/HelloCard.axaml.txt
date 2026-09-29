@@ -6,7 +6,7 @@
   <Grid RowDefinitions="Auto,*,Auto" Margin="38">
     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
       <Border Width="42" Height="42" CornerRadius="14" Background="#7868FF">
-        <TextBlock Text="✦" FontSize="27" Foreground="White"
+      <TextBlock Text="★" FontSize="27" Foreground="White"
                    HorizontalAlignment="Center" VerticalAlignment="Center" />
       </Border>
       <StackPanel Grid.Column="1" VerticalAlignment="Center">

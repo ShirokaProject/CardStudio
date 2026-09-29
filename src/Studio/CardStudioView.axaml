@@ -23,7 +23,7 @@
       <Grid Margin="16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="20">
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
           <Border Width="32" Height="32" CornerRadius="16" Background="#286FEA">
-            <TextBlock Text="✦" FontSize="20" Foreground="White"
+            <TextBlock Text="★" FontSize="20" Foreground="White"
                        HorizontalAlignment="Center" VerticalAlignment="Center" />
           </Border>
           <TextBlock Text="CardStudio" FontSize="16" FontWeight="SemiBold"
