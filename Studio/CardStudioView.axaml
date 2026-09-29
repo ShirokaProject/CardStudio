@@ -1,0 +1,126 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:editor="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             x:Class="ShiroBot.CardStudio.CardStudioView"
+             Background="White">
+  <UserControl.Styles>
+    <Style Selector="Button.toolbar">
+      <Setter Property="Height" Value="34" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Padding" Value="13,4" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="ComboBox.toolbar">
+      <Setter Property="Height" Value="34" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+  </UserControl.Styles>
+  <Grid RowDefinitions="54,*,30">
+    <Border Grid.Row="0" BorderBrush="#E1E4E9" BorderThickness="0,0,0,1">
+      <Grid Margin="16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="20">
+        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <Border Width="32" Height="32" CornerRadius="16" Background="#286FEA">
+            <TextBlock Text="✦" FontSize="20" Foreground="White"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <TextBlock Text="ShiroBot Card Studio" FontSize="16" FontWeight="SemiBold"
+                     VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5"
+                    VerticalAlignment="Center">
+          <Button x:Name="OpenButton" Classes="toolbar" Content="打开" />
+          <Button x:Name="SaveButton" Classes="toolbar" Content="保存" />
+          <Button x:Name="RefreshButton" Classes="toolbar" Content="运行" />
+          <Button x:Name="SampleButton" Classes="toolbar" Content="示例" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
+                    VerticalAlignment="Center">
+          <Button x:Name="LoadAssemblyButton" Classes="toolbar" Content="加载 DLL" />
+          <ComboBox x:Name="ControlTypeCombo" Classes="toolbar" Width="125" IsEnabled="False" />
+          <Button x:Name="InsertTypeButton" Classes="toolbar" Content="插入控件" IsEnabled="False" />
+          <Button x:Name="ThemeButton" Classes="toolbar" Content="浅色" />
+          <TextBox x:Name="DpiBox" Width="64" Height="34" MinHeight="0" Text="192"
+                   HorizontalContentAlignment="Center" PlaceholderText="DPI" />
+          <Button x:Name="ExportButton" Classes="toolbar" Content="导出 PNG" IsEnabled="False" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,5,*" MinHeight="0">
+      <Grid Grid.Column="0" RowDefinitions="Auto,*" MinHeight="0">
+        <Grid Margin="20,14,20,8" ColumnDefinitions="*,Auto">
+          <TextBlock Text="代码" FontSize="15" FontWeight="SemiBold"
+                     VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" Text="编辑后自动刷新" FontSize="12"
+                     Foreground="#748091" VerticalAlignment="Center" />
+        </Grid>
+        <TabControl x:Name="EditorTabs" Grid.Row="1" TabStripPlacement="Bottom"
+                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                    Background="White">
+          <TabItem Header="AXAML" Height="40" VerticalContentAlignment="Center">
+            <editor:TextEditor x:Name="CodeEditor" Margin="8,0,8,4"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                     ShowLineNumbers="True"
+                     FontFamily="Menlo, Consolas, monospace"
+                     FontSize="13" Background="White" />
+          </TabItem>
+          <TabItem Header="C#" Height="40" VerticalContentAlignment="Center">
+            <editor:TextEditor x:Name="CSharpEditor" Margin="8,0,8,4"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                     ShowLineNumbers="True"
+                     FontFamily="Menlo, Consolas, monospace"
+                     FontSize="13" Background="White" />
+          </TabItem>
+          <TabItem Header="ViewModel（可选）" Height="40" VerticalContentAlignment="Center">
+            <editor:TextEditor x:Name="ViewModelEditor" Margin="8,0,8,4"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                     ShowLineNumbers="True"
+                     FontFamily="Menlo, Consolas, monospace"
+                     FontSize="13" Background="White" />
+          </TabItem>
+        </TabControl>
+      </Grid>
+
+      <GridSplitter Grid.Column="1" Width="5" Background="#D9DEE7" />
+
+      <Grid Grid.Column="2" RowDefinitions="Auto,*,Auto" MinHeight="0">
+        <Grid Margin="20,14,20,8" ColumnDefinitions="*,Auto">
+          <TextBlock Text="预览" FontSize="15" FontWeight="SemiBold"
+                     VerticalAlignment="Center" />
+          <TextBlock x:Name="PreviewMetaText" Grid.Column="1" Text="等待渲染"
+                     FontSize="12" Foreground="#748091" VerticalAlignment="Center" />
+        </Grid>
+        <Border Grid.Row="1" Background="#F3F5F8" Padding="20" ClipToBounds="True">
+          <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
+            <ThemeVariantScope x:Name="CardThemeScope">
+              <ThemeVariantScope.Styles>
+                <FluentTheme />
+              </ThemeVariantScope.Styles>
+              <ContentControl x:Name="CardHost" HorizontalAlignment="Center"
+                              VerticalAlignment="Center" />
+            </ThemeVariantScope>
+          </Viewbox>
+        </Border>
+        <Border x:Name="ErrorPanel" Grid.Row="2" IsVisible="False"
+                Padding="12,9" Background="#FFF0F0">
+          <TextBlock x:Name="ErrorText" Foreground="#B53443" FontSize="12"
+                     TextWrapping="Wrap" MaxHeight="110" />
+        </Border>
+      </Grid>
+    </Grid>
+
+    <Border Grid.Row="2" BorderBrush="#E1E4E9" BorderThickness="0,1,0,0">
+      <Grid Margin="16,0" ColumnDefinitions="*,Auto">
+        <TextBlock x:Name="StatusText" Text="准备就绪" FontSize="11"
+                   Foreground="#667386" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="1" Text="ShiroBot · Avalonia 12" FontSize="11"
+                   Foreground="#8994A4" VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

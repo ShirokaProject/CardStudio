@@ -1,0 +1,7 @@
+namespace ShiroBot.CardStudio.Samples;
+
+public sealed class HelloCardViewModel
+{
+    public string Title => "把想法画成卡片。";
+    public string Subtitle => "编辑左侧 AXAML，立即在右侧查看图片效果。";
+}

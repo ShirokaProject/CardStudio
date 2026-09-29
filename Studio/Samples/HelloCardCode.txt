@@ -1,0 +1,12 @@
+using Avalonia.Controls;
+
+namespace ShiroBot.CardStudio.Samples;
+
+public partial class HelloCard : Border
+{
+    public HelloCard()
+    {
+        InitializeComponent();
+        DataContext = new HelloCardViewModel();
+    }
+}

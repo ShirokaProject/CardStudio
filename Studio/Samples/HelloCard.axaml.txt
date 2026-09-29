@@ -1,0 +1,36 @@
+<Border xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ShiroBot.CardStudio.Samples.HelloCard"
+        Width="720" Height="420" CornerRadius="28"
+        Background="#18213A" ClipToBounds="True">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="38">
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+      <Border Width="42" Height="42" CornerRadius="14" Background="#7868FF">
+        <TextBlock Text="✦" FontSize="27" Foreground="White"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+      <StackPanel Grid.Column="1" VerticalAlignment="Center">
+        <TextBlock Text="SHIROBOT" FontSize="14" FontWeight="Bold"
+                   Foreground="#ADA7FF" LetterSpacing="2" />
+        <TextBlock Text="AXAML CARD STUDIO" FontSize="11" Foreground="#AEB9CF" />
+      </StackPanel>
+    </Grid>
+
+    <StackPanel Grid.Row="1" VerticalAlignment="Center" Spacing="12">
+      <TextBlock Text="{Binding Title}" FontSize="39" FontWeight="Bold"
+                 Foreground="White" />
+      <TextBlock Text="{Binding Subtitle}"
+                 FontSize="17" Foreground="#B7C5DD" />
+    </StackPanel>
+
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+      <TextBlock Text="Fluent · Avalonia · ShiroBot" FontSize="13"
+                 Foreground="#899AB8" VerticalAlignment="Center" />
+      <Border Grid.Column="1" Background="#2D3A5C" CornerRadius="10"
+              Padding="14,8">
+        <TextBlock Text="LIVE PREVIEW" Foreground="#C8C3FF"
+                   FontSize="11" FontWeight="Bold" />
+      </Border>
+    </Grid>
+  </Grid>
+</Border>
