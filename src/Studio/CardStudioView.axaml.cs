@@ -99,6 +99,13 @@ public sealed partial class CardStudioView : UserControl
         _cardHost = this.FindControl<ContentControl>("CardHost")!;
         _previewMetaText = this.FindControl<TextBlock>("PreviewMetaText")!;
         _statusText = this.FindControl<TextBlock>("StatusText")!;
+        var version = typeof(CardStudioView).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? $"v{typeof(CardStudioView).Assembly.GetName().Version?.ToString(2)}";
+        var revisionSeparator = version.IndexOf('+');
+        if (revisionSeparator >= 0 && version.Length > revisionSeparator + 8)
+            version = version[..(revisionSeparator + 8)];
+        this.FindControl<TextBlock>("VersionText")!.Text = "CardStudio " + version;
         _errorPanel = this.FindControl<Border>("ErrorPanel")!;
         _errorText = this.FindControl<TextBlock>("ErrorText")!;
         _previewLoadingOverlay = this.FindControl<Border>("PreviewLoadingOverlay")!;

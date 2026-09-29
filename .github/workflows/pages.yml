@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -30,6 +30,27 @@ jobs:
         run: dotnet publish src/Browser/CardStudio.Browser.csproj -c Release
       - name: Allow _framework files on Pages
         run: touch src/Browser/bin/Release/net10.0-browser/publish/wwwroot/.nojekyll
+      - name: Publish desktop single-file apps
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/release"
+          for rid in win-x64 win-arm64 linux-x64 linux-arm64 linux-musl-x64 linux-musl-arm64 osx-x64 osx-arm64; do
+            output="$RUNNER_TEMP/publish/$rid"
+            dotnet publish src/Desktop/CardStudio.Desktop.csproj -c Release -r "$rid" \
+              --self-contained true -o "$output" \
+              -p:PublishSingleFile=true -p:PublishTrimmed=false \
+              -p:DebugType=None -p:DebugSymbols=false
+            extension=""
+            if [[ "$rid" == win-* ]]; then extension=".exe"; fi
+            install -m 755 "$output/CardStudio.Desktop$extension" \
+              "$RUNNER_TEMP/release/CardStudio-$rid$extension"
+          done
+      - name: Package browser app
+        shell: bash
+        run: |
+          cd src/Browser/bin/Release/net10.0-browser/publish/wwwroot
+          zip -qr "$RUNNER_TEMP/release/CardStudio-web-${GITHUB_REF_NAME}.zip" .
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
@@ -41,7 +62,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cd src/Browser/bin/Release/net10.0-browser/publish/wwwroot
-          zip -qr "$RUNNER_TEMP/CardStudio-web-${GITHUB_REF_NAME}.zip" .
-          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/CardStudio-web-${GITHUB_REF_NAME}.zip" \
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/release/"* \
             --title "$GITHUB_REF_NAME" --generate-notes --verify-tag

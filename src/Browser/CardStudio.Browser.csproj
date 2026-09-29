@@ -8,7 +8,7 @@
     <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia.Browser" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Browser" Version="12.1.3" />
     <ProjectReference Include="../Studio/CardStudio.csproj" />
     <AvaloniaResource Include="Assets/Fonts/*.otf" />
   </ItemGroup>

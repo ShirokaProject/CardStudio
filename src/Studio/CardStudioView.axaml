@@ -141,7 +141,7 @@
       <Grid Margin="16,0" ColumnDefinitions="*,Auto">
         <TextBlock x:Name="StatusText" Text="准备就绪" FontSize="11"
                    Foreground="#667386" VerticalAlignment="Center" />
-        <TextBlock Grid.Column="1" Text="ShiroBot · Avalonia 12" FontSize="11"
+        <TextBlock x:Name="VersionText" Grid.Column="1" FontSize="11"
                    Foreground="#8994A4" VerticalAlignment="Center" />
       </Grid>
     </Border>
