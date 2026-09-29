@@ -3,13 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F8FAFF">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111318">
   <title>CardStudio</title>
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="stylesheet" href="./splash.css">
   <style>
     html, body, #out { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #f3f5f9; }
   </style>
 </head>
 <body>
   <div id="out"></div>
+  <div id="preview-busy" class="preview-busy" role="status" aria-label="正在编译并渲染预览" hidden>
+    <div class="preview-busy-content">
+      <svg class="preview-spinner" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="16" fill="none" stroke="#D6E2F4" stroke-width="4" />
+        <path id="preview-wave" fill="none" stroke="#286FEA" stroke-width="4" stroke-linecap="round" />
+      </svg>
+      <span>正在编译并渲染…</span>
+    </div>
+  </div>
+  <div id="boot-screen" class="boot-screen" role="status" aria-label="正在启动 CardStudio">
+    <div class="boot-content">
+      <div class="boot-mark" aria-hidden="true">
+        <img src="./icon.svg" alt="">
+      </div>
+      <div class="boot-name">CardStudio</div>
+      <h1 class="boot-title">让想法成形。</h1>
+      <p id="boot-message" class="boot-message">正在准备画布</p>
+      <div class="boot-progress-track" aria-hidden="true"><div id="boot-progress"></div></div>
+      <button id="boot-retry" type="button" hidden>重新加载</button>
+    </div>
+  </div>
+  <script src="./vendor/gsap.min.js"></script>
+  <script src="./vendor/SplitText.min.js"></script>
   <script type="module" src="./main.js"></script>
 </body>
 </html>

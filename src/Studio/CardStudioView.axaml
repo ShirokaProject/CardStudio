@@ -1,6 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:editor="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:icons="using:Material3.Avalonia.Icons"
+             xmlns:material="using:Material3.Avalonia.Controls"
              x:Class="CardStudio.CardStudioView"
              Background="White">
   <UserControl.Styles>
@@ -22,9 +24,11 @@
     <Border Grid.Row="0" BorderBrush="#E1E4E9" BorderThickness="0,0,0,1">
       <Grid Margin="16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="20">
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-          <Border Width="32" Height="32" CornerRadius="16" Background="#286FEA">
-            <TextBlock Text="★" FontSize="20" Foreground="White"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Border Width="32" Height="32" CornerRadius="10" Background="#286FEA">
+            <Path Width="22" Height="22" Stretch="Uniform" Fill="Transparent"
+                  Stroke="White" StrokeThickness="3" StrokeLineCap="Round"
+                  Data="M17,9 H31 C36,9 39,12 39,17 V31 C39,36 36,39 31,39 H17 C12,39 9,36 9,31 V17 C9,12 12,9 17,9 Z M16,20 H32 M16,28 H27"
+                  HorizontalAlignment="Center" VerticalAlignment="Center" />
           </Border>
           <TextBlock Text="CardStudio" FontSize="16" FontWeight="SemiBold"
                      VerticalAlignment="Center" />
@@ -44,9 +48,16 @@
           <ComboBox x:Name="ControlTypeCombo" Classes="toolbar" Width="125" IsEnabled="False" />
           <Button x:Name="InsertTypeButton" Classes="toolbar" Content="插入控件" IsEnabled="False" />
           <Button x:Name="ThemeButton" Classes="toolbar" Content="浅色" />
-          <TextBox x:Name="DpiBox" Width="64" Height="34" MinHeight="0" Text="192"
-                   HorizontalContentAlignment="Center" PlaceholderText="DPI" />
-          <Button x:Name="ExportButton" Classes="toolbar" Content="导出 PNG" IsEnabled="False" />
+          <TextBox x:Name="DpiBox" Width="64" Height="42" MinHeight="0" Text="192"
+                   Padding="0" FontSize="14" TextAlignment="Center"
+                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                   PlaceholderText="DPI" />
+          <Button x:Name="CopyButton" Classes="toolbar" Content="复制 PNG" IsEnabled="False" />
+          <Button x:Name="DownloadButton" Classes="toolbar" Width="36" Padding="8,4"
+                  ToolTip.Tip="下载 PNG" IsEnabled="False">
+            <PathIcon Width="18" Height="18" Foreground="White"
+                      Data="{x:Static icons:MaterialSymbols.Download}" />
+          </Button>
         </StackPanel>
       </Grid>
     </Border>
@@ -95,17 +106,29 @@
           <TextBlock x:Name="PreviewMetaText" Grid.Column="1" Text="等待渲染"
                      FontSize="12" Foreground="#748091" VerticalAlignment="Center" />
         </Grid>
-        <Border Grid.Row="1" Background="#F3F5F8" Padding="20" ClipToBounds="True">
-          <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
-            <ThemeVariantScope x:Name="CardThemeScope">
-              <ThemeVariantScope.Styles>
-                <FluentTheme />
-              </ThemeVariantScope.Styles>
-              <ContentControl x:Name="CardHost" HorizontalAlignment="Center"
-                              VerticalAlignment="Center" />
-            </ThemeVariantScope>
-          </Viewbox>
-        </Border>
+        <Grid Grid.Row="1">
+          <Border Background="#F3F5F8" Padding="20" ClipToBounds="True">
+            <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
+              <ThemeVariantScope x:Name="CardThemeScope">
+                <ThemeVariantScope.Styles>
+                  <FluentTheme />
+                </ThemeVariantScope.Styles>
+                <ContentControl x:Name="CardHost" HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+              </ThemeVariantScope>
+            </Viewbox>
+          </Border>
+          <Border x:Name="PreviewLoadingOverlay" IsVisible="False" Background="#DDF3F5F8">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+              <material:CircularProgressIndicator Width="48" Height="48"
+                                                  IsIndeterminate="True" IsWavy="True"
+                                                  StrokeWidth="4" Amplitude="2" WaveCount="5"
+                                                  Foreground="#286FEA" Background="#D6E2F4"
+                                                  HorizontalAlignment="Center" />
+              <TextBlock Text="正在编译并渲染…" FontSize="14" Foreground="#40516B" />
+            </StackPanel>
+          </Border>
+        </Grid>
         <Border x:Name="ErrorPanel" Grid.Row="2" IsVisible="False"
                 Padding="12,9" Background="#FFF0F0">
           <TextBlock x:Name="ErrorText" Foreground="#B53443" FontSize="12"

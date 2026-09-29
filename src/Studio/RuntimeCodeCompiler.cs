@@ -134,7 +134,10 @@ public static class RuntimeXamlContext
     public static void Load(Control root)
     {
         if (_axaml is null) throw new InvalidOperationException("AXAML 初始化上下文不存在。");
-        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(_axaml));
+        var document = XDocument.Parse(_axaml, LoadOptions.PreserveWhitespace);
+        // The instance already has the compiled x:Class; resolving it again can pick an older live assembly.
+        document.Root?.Attribute(XName.Get("Class", "http://schemas.microsoft.com/winfx/2006/xaml"))?.Remove();
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(document.ToString(SaveOptions.DisableFormatting)));
         AvaloniaRuntimeXamlLoader.Load(stream, root.GetType().Assembly, root);
         Initialized = true;
     }

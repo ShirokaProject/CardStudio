@@ -1,9 +1,12 @@
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
+using System.Text.Json;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -11,6 +14,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using AvaloniaEdit;
+using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.TextMate;
 using TextMateSharp.Grammars;
 
@@ -23,10 +27,12 @@ public sealed partial class CardStudioView : UserControl
     private readonly TextEditor _viewModelEditor;
     private readonly TextBox _dpiBox;
     private readonly Button _themeButton;
+    private readonly Button _refreshButton;
     private bool _darkTheme;
     private readonly ComboBox _controlTypeCombo;
     private readonly Button _insertTypeButton;
-    private readonly Button _exportButton;
+    private readonly Button _copyButton;
+    private readonly Button _downloadButton;
     private readonly ThemeVariantScope _cardThemeScope;
     private readonly ContentControl _cardHost;
     private Viewbox? _renderRoot;
@@ -36,6 +42,9 @@ public sealed partial class CardStudioView : UserControl
     private readonly TextBlock _statusText;
     private readonly Border _errorPanel;
     private readonly TextBlock _errorText;
+    private readonly Border _previewLoadingOverlay;
+    private bool _previewBusy;
+    private bool _copyInProgress;
     private readonly DispatcherTimer _previewTimer;
     private readonly List<string> _assemblyDirectories = [];
     private Assembly? _localAssembly;
@@ -55,28 +64,44 @@ public sealed partial class CardStudioView : UserControl
         _codeEditor = this.FindControl<TextEditor>("CodeEditor")!;
         _csharpEditor = this.FindControl<TextEditor>("CSharpEditor")!;
         _viewModelEditor = this.FindControl<TextEditor>("ViewModelEditor")!;
-        if (!OperatingSystem.IsBrowser())
+        if (OperatingSystem.IsBrowser())
         {
-            var grammars = new RegistryOptions(ThemeName.LightPlus);
-            _codeEditor.InstallTextMate(grammars).SetGrammar(
-                grammars.GetScopeByLanguageId(grammars.GetLanguageByExtension(".xml").Id));
-            foreach (var editor in new[] { _csharpEditor, _viewModelEditor })
+            _codeEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("XML");
+            _csharpEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
+            _viewModelEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
+        }
+        else
+        {
+            try
             {
-                editor.InstallTextMate(grammars).SetGrammar(
-                    grammars.GetScopeByLanguageId(grammars.GetLanguageByExtension(".cs").Id));
+                var grammars = new RegistryOptions(ThemeName.LightPlus);
+                _codeEditor.InstallTextMate(grammars).SetGrammar(
+                    grammars.GetScopeByLanguageId(grammars.GetLanguageByExtension(".xml").Id));
+                foreach (var editor in new[] { _csharpEditor, _viewModelEditor })
+                {
+                    editor.InstallTextMate(grammars).SetGrammar(
+                        grammars.GetScopeByLanguageId(grammars.GetLanguageByExtension(".cs").Id));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Card Studio: 语法高亮初始化失败：" + GetUsefulError(ex));
             }
         }
         _dpiBox = this.FindControl<TextBox>("DpiBox")!;
         _themeButton = this.FindControl<Button>("ThemeButton")!;
+        _refreshButton = this.FindControl<Button>("RefreshButton")!;
         _controlTypeCombo = this.FindControl<ComboBox>("ControlTypeCombo")!;
         _insertTypeButton = this.FindControl<Button>("InsertTypeButton")!;
-        _exportButton = this.FindControl<Button>("ExportButton")!;
+        _copyButton = this.FindControl<Button>("CopyButton")!;
+        _downloadButton = this.FindControl<Button>("DownloadButton")!;
         _cardThemeScope = this.FindControl<ThemeVariantScope>("CardThemeScope")!;
         _cardHost = this.FindControl<ContentControl>("CardHost")!;
         _previewMetaText = this.FindControl<TextBlock>("PreviewMetaText")!;
         _statusText = this.FindControl<TextBlock>("StatusText")!;
         _errorPanel = this.FindControl<Border>("ErrorPanel")!;
         _errorText = this.FindControl<TextBlock>("ErrorText")!;
+        _previewLoadingOverlay = this.FindControl<Border>("PreviewLoadingOverlay")!;
 
         _previewTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(450) };
         _previewTimer.Tick += (_, _) =>
@@ -91,13 +116,14 @@ public sealed partial class CardStudioView : UserControl
         {
             _darkTheme = !_darkTheme;
             _themeButton.Content = _darkTheme ? "深色" : "浅色";
-            RenderPreview();
+            if (!_previewBusy) RenderPreview();
         };
-        this.FindControl<Button>("RefreshButton")!.Click += (_, _) => RenderPreview(forceCompile: true);
+        _refreshButton.Click += async (_, _) => await RunPreviewAsync();
         this.FindControl<Button>("SampleButton")!.Click += (_, _) => LoadSample();
         this.FindControl<Button>("OpenButton")!.Click += async (_, _) => await OpenAxamlAsync();
         this.FindControl<Button>("SaveButton")!.Click += async (_, _) => await SaveAxamlAsync();
-        _exportButton.Click += async (_, _) => await ExportPngAsync();
+        _copyButton.Click += async (_, _) => await CopyPngAsync();
+        _downloadButton.Click += async (_, _) => await ExportPngAsync();
         this.FindControl<Button>("LoadAssemblyButton")!.Click += async (_, _) => await LoadAssemblyAsync();
         _insertTypeButton.Click += (_, _) => InsertReflectedControl();
         _csharpEditor.TextChanged += (_, _) => _statusText.Text = "C# 已修改 · 点击运行以编译并预览";
@@ -123,6 +149,7 @@ public sealed partial class CardStudioView : UserControl
 
     private void SchedulePreview()
     {
+        if (_previewBusy) return;
         _previewTimer.Stop();
         _previewTimer.Start();
     }
@@ -144,11 +171,70 @@ public sealed partial class CardStudioView : UserControl
         return new StreamReader(stream).ReadToEnd();
     }
 
+    private async Task RunPreviewAsync()
+    {
+        if (_previewBusy) return;
+
+        _previewTimer.Stop();
+        ++_renderVersion;
+        var axaml = _codeEditor.Text ?? string.Empty;
+        var code = _csharpEditor.Text ?? string.Empty;
+        var viewModel = _viewModelEditor.Text ?? string.Empty;
+        SetPreviewBusy(true);
+        _statusText.Text = "正在编译并渲染预览…";
+
+        // Let the pressed button and loading indicator paint before Roslyn uses the UI thread on WASM.
+        await Task.Delay(OperatingSystem.IsBrowser() ? 320 : 50);
+
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(code))
+            {
+                var classMatch = Regex.Match(axaml, "x:Class=\\\"([^\\\"]+)\\\"").Value;
+                var codeKey = classMatch + "\n" + code + "\n" + viewModel;
+                var compiled = OperatingSystem.IsBrowser()
+                    ? RuntimeCodeCompiler.Compile(axaml, code, viewModel)
+                    : await Task.Run(() => RuntimeCodeCompiler.Compile(axaml, code, viewModel));
+
+                if (axaml != _codeEditor.Text || code != _csharpEditor.Text ||
+                    viewModel != _viewModelEditor.Text)
+                {
+                    _statusText.Text = "代码已修改 · 请再次点击运行";
+                    SetPreviewBusy(false);
+                    return;
+                }
+
+                (_compiledAssembly, _compiledViewType) = compiled;
+                _compiledCodeKey = codeKey;
+            }
+
+            RenderPreview();
+        }
+        catch (Exception ex)
+        {
+            ShowError(GetUsefulError(ex));
+        }
+    }
+
+    private void SetPreviewBusy(bool busy)
+    {
+        _previewBusy = busy;
+        if (busy)
+        {
+            _copyButton.IsEnabled = false;
+            _downloadButton.IsEnabled = false;
+        }
+        _previewLoadingOverlay.IsVisible = busy && !OperatingSystem.IsBrowser();
+        if (OperatingSystem.IsBrowser())
+            JSHost.GlobalThis.SetProperty("cardStudioPreviewBusy", busy);
+    }
+
     private void RenderPreview(bool forceCompile = false)
     {
         _previewTimer.Stop();
         var version = ++_renderVersion;
-        _exportButton.IsEnabled = false;
+        _copyButton.IsEnabled = false;
+        _downloadButton.IsEnabled = false;
         var axaml = _codeEditor.Text;
         if (string.IsNullOrWhiteSpace(axaml))
         {
@@ -285,11 +371,16 @@ public sealed partial class CardStudioView : UserControl
             _previewMetaText.Text = $"{pixelWidth} × {pixelHeight} px · {dpi:0.#} DPI";
             _statusText.Text = "预览已更新 · 编辑 AXAML 会自动刷新";
             _errorPanel.IsVisible = false;
-            _exportButton.IsEnabled = true;
+            _copyButton.IsEnabled = true;
+            _downloadButton.IsEnabled = true;
         }
         catch (Exception ex)
         {
             ShowError(GetUsefulError(ex));
+        }
+        finally
+        {
+            if (version == _renderVersion) SetPreviewBusy(false);
         }
     }
 
@@ -430,10 +521,32 @@ public sealed partial class CardStudioView : UserControl
             return;
         }
 
+        var suggestedName = Path.GetFileNameWithoutExtension(_currentPath ?? "card.axaml") + ".png";
+        if (OperatingSystem.IsBrowser())
+        {
+            try
+            {
+                using var png = new MemoryStream();
+                _previewBitmap.Save(png, PngBitmapEncoderOptions.Default);
+                var payload = JsonSerializer.Serialize(new
+                {
+                    fileName = suggestedName,
+                    base64 = Convert.ToBase64String(png.ToArray())
+                });
+                JSHost.GlobalThis.SetProperty("cardStudioPngDownload", payload);
+                _statusText.Text = $"已下载 {suggestedName}";
+            }
+            catch (Exception ex)
+            {
+                ShowError(GetUsefulError(ex));
+            }
+            return;
+        }
+
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "导出 PNG",
-            SuggestedFileName = Path.GetFileNameWithoutExtension(_currentPath ?? "card.axaml") + ".png",
+            SuggestedFileName = suggestedName,
             DefaultExtension = "png",
             FileTypeChoices = [new FilePickerFileType("PNG 图片") { Patterns = ["*.png"] }]
         });
@@ -450,6 +563,31 @@ public sealed partial class CardStudioView : UserControl
         catch (Exception ex)
         {
             ShowError(GetUsefulError(ex));
+        }
+    }
+
+    private async Task CopyPngAsync()
+    {
+        if (_previewBitmap is null || _previewBusy || _copyInProgress) return;
+
+        _copyInProgress = true;
+        try
+        {
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard
+                ?? throw new InvalidOperationException("剪贴板不可用。");
+            await clipboard.SetBitmapAsync(_previewBitmap);
+            _statusText.Text = "图片已复制到剪贴板";
+            _errorPanel.IsVisible = false;
+        }
+        catch (Exception ex)
+        {
+            _errorText.Text = "复制图片失败：" + GetUsefulError(ex);
+            _errorPanel.IsVisible = true;
+            _statusText.Text = "复制图片失败";
+        }
+        finally
+        {
+            _copyInProgress = false;
         }
     }
 
@@ -536,8 +674,10 @@ public sealed partial class CardStudioView : UserControl
 
     private void ShowError(string message)
     {
+        SetPreviewBusy(false);
         Console.Error.WriteLine("Card Studio: " + message);
-        _exportButton.IsEnabled = false;
+        _copyButton.IsEnabled = false;
+        _downloadButton.IsEnabled = false;
         _errorText.Text = message;
         _errorPanel.IsVisible = true;
         _statusText.Text = "渲染失败 · 修改 AXAML 后会自动重试";

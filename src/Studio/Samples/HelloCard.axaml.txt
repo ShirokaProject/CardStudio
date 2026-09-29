@@ -2,33 +2,59 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="CardStudio.Samples.HelloCard"
         Width="720" Height="420" CornerRadius="28"
-        Background="#18213A" ClipToBounds="True">
+        Background="{DynamicResource CardSurface}" ClipToBounds="True">
+  <Border.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="CardSurface">#F7F8FF</SolidColorBrush>
+          <SolidColorBrush x:Key="CardPrimary">#1D1B20</SolidColorBrush>
+          <SolidColorBrush x:Key="CardSecondary">#555F75</SolidColorBrush>
+          <SolidColorBrush x:Key="CardAccent">#6750A4</SolidColorBrush>
+          <SolidColorBrush x:Key="CardBrand">#59428F</SolidColorBrush>
+          <SolidColorBrush x:Key="CardBadge">#E9DEF8</SolidColorBrush>
+          <SolidColorBrush x:Key="CardBadgeText">#4F378B</SolidColorBrush>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="CardSurface">#18213A</SolidColorBrush>
+          <SolidColorBrush x:Key="CardPrimary">#FFFFFF</SolidColorBrush>
+          <SolidColorBrush x:Key="CardSecondary">#B7C5DD</SolidColorBrush>
+          <SolidColorBrush x:Key="CardAccent">#7868FF</SolidColorBrush>
+          <SolidColorBrush x:Key="CardBrand">#ADA7FF</SolidColorBrush>
+          <SolidColorBrush x:Key="CardBadge">#2D3A5C</SolidColorBrush>
+          <SolidColorBrush x:Key="CardBadgeText">#C8C3FF</SolidColorBrush>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Border.Resources>
   <Grid RowDefinitions="Auto,*,Auto" Margin="38">
     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
-      <Border Width="42" Height="42" CornerRadius="14" Background="#7868FF">
-      <TextBlock Text="★" FontSize="27" Foreground="White"
-                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+      <Border Width="42" Height="42" CornerRadius="14" Background="{DynamicResource CardAccent}">
+        <Path Width="28" Height="28" Stretch="Uniform" Fill="Transparent"
+              Stroke="White" StrokeThickness="3" StrokeLineCap="Round"
+              Data="M17,9 H31 C36,9 39,12 39,17 V31 C39,36 36,39 31,39 H17 C12,39 9,36 9,31 V17 C9,12 12,9 17,9 Z M16,20 H32 M16,28 H27"
+              HorizontalAlignment="Center" VerticalAlignment="Center" />
       </Border>
       <StackPanel Grid.Column="1" VerticalAlignment="Center">
         <TextBlock Text="SHIROBOT" FontSize="14" FontWeight="Bold"
-                   Foreground="#ADA7FF" LetterSpacing="2" />
-        <TextBlock Text="AXAML CARD STUDIO" FontSize="11" Foreground="#AEB9CF" />
+                   Foreground="{DynamicResource CardBrand}" LetterSpacing="2" />
+        <TextBlock Text="AXAML CARD STUDIO" FontSize="11" Foreground="{DynamicResource CardSecondary}" />
       </StackPanel>
     </Grid>
 
     <StackPanel Grid.Row="1" VerticalAlignment="Center" Spacing="12">
       <TextBlock Text="{Binding Title}" FontSize="39" FontWeight="Bold"
-                 Foreground="White" />
+                 Foreground="{DynamicResource CardPrimary}" />
       <TextBlock Text="{Binding Subtitle}"
-                 FontSize="17" Foreground="#B7C5DD" />
+                 FontSize="17" Foreground="{DynamicResource CardSecondary}" />
     </StackPanel>
 
     <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
       <TextBlock Text="Fluent · Avalonia · ShiroBot" FontSize="13"
-                 Foreground="#899AB8" VerticalAlignment="Center" />
-      <Border Grid.Column="1" Background="#2D3A5C" CornerRadius="10"
+                 Foreground="{DynamicResource CardSecondary}" VerticalAlignment="Center" />
+      <Border Grid.Column="1" Background="{DynamicResource CardBadge}" CornerRadius="10"
               Padding="14,8">
-        <TextBlock Text="LIVE PREVIEW" Foreground="#C8C3FF"
+        <TextBlock Text="LIVE PREVIEW" Foreground="{DynamicResource CardBadgeText}"
                    FontSize="11" FontWeight="Bold" />
       </Border>
     </Grid>
