@@ -1,22 +1,17 @@
-name: Deploy WASM to GitHub Pages
+name: Release CardStudio
 
 on:
   push:
-    branches: [main]
-    paths:
-      - src/**
-      - CardStudio.slnx
-      - .github/workflows/pages.yml
-  workflow_dispatch:
+    tags: ['**']
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -42,3 +37,11 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd src/Browser/bin/Release/net10.0-browser/publish/wwwroot
+          zip -qr "$RUNNER_TEMP/CardStudio-web-${GITHUB_REF_NAME}.zip" .
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/CardStudio-web-${GITHUB_REF_NAME}.zip" \
+            --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
