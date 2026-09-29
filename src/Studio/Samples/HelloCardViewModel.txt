@@ -1,4 +1,4 @@
-namespace ShiroBot.CardStudio.Samples;
+namespace CardStudio.Samples;
 
 public sealed class HelloCardViewModel
 {

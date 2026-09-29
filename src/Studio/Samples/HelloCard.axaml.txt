@@ -1,6 +1,6 @@
 <Border xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="ShiroBot.CardStudio.Samples.HelloCard"
+        x:Class="CardStudio.Samples.HelloCard"
         Width="720" Height="420" CornerRadius="28"
         Background="#18213A" ClipToBounds="True">
   <Grid RowDefinitions="Auto,*,Auto" Margin="38">

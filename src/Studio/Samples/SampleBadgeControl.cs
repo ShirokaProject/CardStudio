@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 
-namespace ShiroBot.CardStudio.Samples;
+namespace CardStudio.Samples;
 
 /// <summary>供 DLL 反射加载功能试用的最小自定义控件。</summary>
 public sealed class SampleBadgeControl : UserControl

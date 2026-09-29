@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-namespace ShiroBot.CardStudio;
+namespace CardStudio;
 
 public sealed partial class App : Application
 {
@@ -15,7 +15,7 @@ public sealed partial class App : Application
         {
             desktop.MainWindow = new Window
             {
-                Title = "ShiroBot Card Studio",
+                Title = "CardStudio",
                 Width = 1480,
                 Height = 900,
                 MinWidth = 1360,

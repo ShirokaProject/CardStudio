@@ -1,24 +1,24 @@
-# ShiroBot Card Studio
+# CardStudio
 
-独立的 Avalonia 卡片工具，提供桌面版和 WebAssembly 浏览器版。左侧可编辑 AXAML、C# 代码隐藏文件和可选的 ViewModel，右侧实时预览并导出 PNG。编辑器使用 Material3.Avalonia 主题和带行号、语法着色的 AvaloniaEdit；卡片预览使用与 ShiroBot 宿主相同的 FluentTheme。AXAML 在停止输入约 450 毫秒后自动更新；修改 C# 后点击「运行」重新编译。
+独立的 Avalonia 卡片工具，提供桌面版和 WebAssembly 浏览器版。左侧可编辑 AXAML、C# 代码隐藏文件和可选的 ViewModel，右侧实时预览并导出 PNG。两个版本的编辑器都使用 Material3.Avalonia 主题和带行号的 AvaloniaEdit；桌面版还支持 TextMate 语法着色。卡片预览使用与 ShiroBot 宿主相同的 FluentTheme。AXAML 在停止输入约 450 毫秒后自动更新；修改 C# 后点击「运行」重新编译。
 
 ## 运行
 
 需要 .NET 10 SDK。在本仓库根目录运行桌面版：
 
 ```bash
-dotnet run --project Desktop/ShiroBot.CardStudio.Desktop.csproj
+dotnet run --project src/Desktop/CardStudio.Desktop.csproj
 ```
 
 运行浏览器版（先安装 `dotnet workload install wasm-tools`）：
 
 ```bash
-dotnet run --project Browser/ShiroBot.CardStudio.Browser.csproj
+dotnet run --project src/Browser/CardStudio.Browser.csproj
 ```
 
-打开命令输出的本地 HTTP 地址。发布静态站点可执行 `dotnet publish Browser/ShiroBot.CardStudio.Browser.csproj -c Release`，然后部署 `Browser/bin/Release/net10.0-browser/publish/wwwroot`。
+打开命令输出的本地 HTTP 地址。发布静态站点可执行 `dotnet publish src/Browser/CardStudio.Browser.csproj -c Release`，然后部署 `src/Browser/bin/Release/net10.0-browser/publish/wwwroot`。推送 `main` 分支的 `src/` 变更时，GitHub Actions 会自动构建并部署浏览器版到 [GitHub Pages](https://shirokaproject.github.io/CardStudio/)；也可从 Actions 手动运行部署工作流。
 
-启动后会打开 `Studio/Samples` 中的三文件示例。卡片根节点最好显式设置 `Width` 和 `Height`；DPI 影响导出 PNG 的像素尺寸，右侧预览会按可用空间缩放显示。截图采用与 ShiroBot 宿主相同的尺寸解析、`Viewbox.Stretch.Fill` 放大和 96 DPI 位图渲染流程。宿主使用 Avalonia Headless，桌面和浏览器使用各自平台后端；系统字体不同仍可能导致像素差异。
+启动后会打开 `src/Studio/Samples` 中的三文件示例。卡片根节点最好显式设置 `Width` 和 `Height`；DPI 影响导出 PNG 的像素尺寸，右侧预览会按可用空间缩放显示。截图采用与 ShiroBot 宿主相同的尺寸解析、`Viewbox.Stretch.Fill` 放大和 96 DPI 位图渲染流程。宿主使用 Avalonia Headless，桌面和浏览器使用各自平台后端；系统字体不同仍可能导致像素差异。
 
 ## 使用自己的 AXAML 和控件
 
@@ -30,4 +30,4 @@ dotnet run --project Browser/ShiroBot.CardStudio.Browser.csproj
 
 自定义控件 DLL 所依赖的程序集可放在同一目录；工具会从该目录解析依赖。请使用与本项目相同的 Avalonia 主版本，并避免携带另一份 Avalonia 运行时。DLL 加载进当前进程后不能热替换，更新 DLL 时请重启工具。
 
-可以用工具自身的 `Studio/bin/Debug/net10.0/ShiroBot.CardStudio.dll` 测试反射功能；其中包含 `ShiroBot.CardStudio.Samples.SampleBadgeControl`。
+可以用工具自身的 `src/Studio/bin/Debug/net10.0/CardStudio.dll` 测试反射功能；其中包含 `CardStudio.Samples.SampleBadgeControl`。

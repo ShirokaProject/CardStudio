@@ -1,6 +1,6 @@
 using Avalonia;
 using Avalonia.Browser;
-using ShiroBot.CardStudio;
+using CardStudio;
 
 internal static class Program
 {

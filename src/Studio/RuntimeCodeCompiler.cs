@@ -8,7 +8,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace ShiroBot.CardStudio;
+namespace CardStudio;
 
 internal static class RuntimeCodeCompiler
 {
@@ -31,7 +31,7 @@ internal static class RuntimeCodeCompiler
                 public partial class {{typeName}}
                 {
                     private void InitializeComponent() =>
-                        ShiroBot.CardStudio.RuntimeXamlContext.Initialize((Avalonia.Controls.Control)this);
+                        CardStudio.RuntimeXamlContext.Initialize((Avalonia.Controls.Control)this);
                 }
             }
             """;
@@ -48,7 +48,7 @@ internal static class RuntimeCodeCompiler
         }
 
         var compilation = CSharpCompilation.Create(
-            "ShiroBot.CardStudio.Live." + Guid.NewGuid().ToString("N"),
+            "CardStudio.Live." + Guid.NewGuid().ToString("N"),
             trees,
             GetReferences(),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));

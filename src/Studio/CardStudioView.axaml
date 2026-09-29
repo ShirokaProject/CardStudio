@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:editor="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
-             x:Class="ShiroBot.CardStudio.CardStudioView"
+             x:Class="CardStudio.CardStudioView"
              Background="White">
   <UserControl.Styles>
     <Style Selector="Button.toolbar">
@@ -26,7 +26,7 @@
             <TextBlock Text="✦" FontSize="20" Foreground="White"
                        HorizontalAlignment="Center" VerticalAlignment="Center" />
           </Border>
-          <TextBlock Text="ShiroBot Card Studio" FontSize="16" FontWeight="SemiBold"
+          <TextBlock Text="CardStudio" FontSize="16" FontWeight="SemiBold"
                      VerticalAlignment="Center" />
         </StackPanel>
 

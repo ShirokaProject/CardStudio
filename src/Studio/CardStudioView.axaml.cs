@@ -14,7 +14,7 @@ using AvaloniaEdit;
 using AvaloniaEdit.TextMate;
 using TextMateSharp.Grammars;
 
-namespace ShiroBot.CardStudio;
+namespace CardStudio;
 
 public sealed partial class CardStudioView : UserControl
 {
@@ -139,7 +139,7 @@ public sealed partial class CardStudioView : UserControl
     private static string ReadSample(string name)
     {
         using var stream = typeof(CardStudioView).Assembly.GetManifestResourceStream(
-            "ShiroBot.CardStudio.Samples." + name);
+            "CardStudio.Samples." + name);
         if (stream is null) throw new InvalidOperationException($"示例文件 {name} 不存在。");
         return new StreamReader(stream).ReadToEnd();
     }

@@ -1,7 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:m3="using:Material3.Avalonia"
-             x:Class="ShiroBot.CardStudio.App">
+             x:Class="CardStudio.App">
   <Application.Styles>
     <FluentTheme />
     <m3:MaterialTheme SeedColor="#286FEA" />

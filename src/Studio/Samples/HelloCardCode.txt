@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace ShiroBot.CardStudio.Samples;
+namespace CardStudio.Samples;
 
 public partial class HelloCard : Border
 {

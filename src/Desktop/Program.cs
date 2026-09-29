@@ -1,6 +1,6 @@
 using Avalonia;
 
-namespace ShiroBot.CardStudio;
+namespace CardStudio;
 
 internal static class Program
 {
