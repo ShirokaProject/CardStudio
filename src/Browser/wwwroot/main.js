@@ -1,6 +1,22 @@
 import './assets.js';
 import { waitForIntro, studioReady, studioFailed } from './splash.js';
 
+const editorHost = document.getElementById('out');
+let composing = false;
+document.addEventListener('compositionstart', event => {
+  if (editorHost.contains(event.target)) composing = true;
+}, true);
+document.addEventListener('compositionend', () => {
+  composing = false;
+}, true);
+document.addEventListener('keydown', event => {
+  if (editorHost.contains(event.target) &&
+      (composing || event.isComposing || event.keyCode === 229)) {
+    // Keep the browser's IME active, but do not forward its raw keys to Avalonia.
+    event.stopPropagation();
+  }
+}, true);
+
 const previewBusy = document.getElementById('preview-busy');
 const previewWave = document.getElementById('preview-wave');
 const wavePoints = [];
@@ -49,7 +65,7 @@ Object.defineProperty(globalThis, "cardStudioDarkTheme", {
 
 await waitForIntro();
 
-const host = document.getElementById('out');
+const host = editorHost;
 const showStudio = () => {
   observer.disconnect();
   clearTimeout(startupTimeout);

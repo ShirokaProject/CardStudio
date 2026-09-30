@@ -18,6 +18,7 @@ public sealed partial class CardStudioView
         {
             if (string.IsNullOrEmpty(e.Text)) return;
             var trigger = e.Text[^1];
+            if (trigger > 127) return;
             if (!char.IsLetterOrDigit(trigger) && trigger is not ('<' or '/' or ' ' or '=' or '"' or '\'' or '.' or ':' or '{'))
                 return;
             if (_axamlCompletionWindow is not null &&
