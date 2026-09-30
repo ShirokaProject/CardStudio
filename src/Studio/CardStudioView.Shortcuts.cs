@@ -23,6 +23,10 @@ public sealed partial class CardStudioView
                     case Key.X: editor.Cut(); break;
                     case Key.A: editor.SelectAll(); break;
                     case Key.F: search.Open(); break;
+                    case Key.Z:
+                        if (e.KeyModifiers.HasFlag(KeyModifiers.Shift)) editor.Redo();
+                        else editor.Undo();
+                        break;
                     default: return;
                 }
                 e.Handled = true;
