@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:m3="using:Material3.Avalonia"
              xmlns:completion="using:AvaloniaEdit.CodeCompletion"
+             xmlns:search="using:AvaloniaEdit.Search"
              x:Class="CardStudio.App" RequestedThemeVariant="Default">
   <Application.Resources>
     <ResourceDictionary>
@@ -45,6 +46,71 @@
     <FluentTheme />
     <m3:MaterialTheme SeedColor="#286FEA" />
     <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    <Style Selector="search|SearchPanel">
+      <Setter Property="Background" Value="{DynamicResource StudioCompletionSurface}" />
+      <Setter Property="Foreground" Value="{DynamicResource StudioText}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource StudioOutline}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Margin" Value="0,8,12,0" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="search|SearchPanel /template/ TextBox">
+      <Setter Property="Background" Value="{DynamicResource StudioEditorSurface}" />
+      <Setter Property="Foreground" Value="{DynamicResource StudioText}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource StudioOutline}" />
+      <Setter Property="CornerRadius" Value="7" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="search|SearchPanel /template/ Button">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource StudioMuted}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="7" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Padding" Value="7,5" />
+    </Style>
+    <Style Selector="search|SearchPanel /template/ Button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource StudioPreviewSurface}" />
+      <Setter Property="Foreground" Value="{DynamicResource StudioText}" />
+    </Style>
+    <Style Selector="search|SearchPanel /template/ TextBox ToggleButton">
+      <Setter Property="Width" Value="26" />
+      <Setter Property="Height" Value="26" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource StudioMuted}" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+            <Viewbox Width="14" Height="14" Stretch="Uniform">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Viewbox>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="search|SearchPanel /template/ TextBox ToggleButton:pointerover">
+      <Setter Property="Background" Value="{DynamicResource StudioPreviewSurface}" />
+      <Setter Property="Foreground" Value="{DynamicResource StudioText}" />
+    </Style>
+    <Style Selector="search|SearchPanel /template/ TextBox ToggleButton:checked">
+      <Setter Property="Background" Value="{DynamicResource StudioProgressTrack}" />
+      <Setter Property="Foreground" Value="{DynamicResource StudioPrimary}" />
+    </Style>
+    <Style Selector="search|SearchPanel /template/ TextBox ToggleButton Path">
+      <Setter Property="Height" Value="14" />
+      <Setter Property="Stretch" Value="Uniform" />
+    </Style>
     <Style Selector="completion|CompletionTipContentControl">
       <Setter Property="Background" Value="{DynamicResource StudioCompletionSurface}" />
       <Setter Property="Foreground" Value="{DynamicResource StudioText}" />

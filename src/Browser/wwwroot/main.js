@@ -55,7 +55,8 @@ Object.defineProperty(globalThis, 'cardStudioPngDownload', {
 
 
 window.addEventListener("keydown", event => {
-  if (event.metaKey && event.key.toLowerCase() === "f" && document.activeElement?.closest("#out")) event.preventDefault();
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "f" &&
+      document.activeElement?.closest("#out")) event.preventDefault();
 });
 
 Object.defineProperty(globalThis, "cardStudioDarkTheme", {
