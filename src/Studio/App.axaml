@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:m3="using:Material3.Avalonia"
+             xmlns:completion="using:AvaloniaEdit.CodeCompletion"
              x:Class="CardStudio.App" RequestedThemeVariant="Default">
   <Application.Resources>
     <ResourceDictionary>
@@ -8,6 +9,7 @@
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="StudioSurface">#FFFFFF</SolidColorBrush>
           <SolidColorBrush x:Key="StudioEditorSurface">#FFFFFF</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioCompletionSurface">#FFFFFF</SolidColorBrush>
           <SolidColorBrush x:Key="StudioPreviewSurface">#F3F5F8</SolidColorBrush>
           <SolidColorBrush x:Key="StudioText">#191C20</SolidColorBrush>
           <SolidColorBrush x:Key="StudioMuted">#667386</SolidColorBrush>
@@ -23,6 +25,7 @@
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="StudioSurface">#111318</SolidColorBrush>
           <SolidColorBrush x:Key="StudioEditorSurface">#17191F</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioCompletionSurface">#252A34</SolidColorBrush>
           <SolidColorBrush x:Key="StudioPreviewSurface">#0D1017</SolidColorBrush>
           <SolidColorBrush x:Key="StudioText">#E2E2E9</SolidColorBrush>
           <SolidColorBrush x:Key="StudioMuted">#ADB8C9</SolidColorBrush>
@@ -42,5 +45,14 @@
     <FluentTheme />
     <m3:MaterialTheme SeedColor="#286FEA" />
     <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    <Style Selector="completion|CompletionTipContentControl">
+      <Setter Property="Background" Value="{DynamicResource StudioCompletionSurface}" />
+      <Setter Property="Foreground" Value="{DynamicResource StudioText}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource StudioOutline}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="8,5" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
   </Application.Styles>
 </Application>

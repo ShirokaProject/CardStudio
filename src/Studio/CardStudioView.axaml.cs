@@ -29,6 +29,7 @@ public sealed partial class CardStudioView : UserControl
     private readonly Button _themeButton;
     private readonly Button _refreshButton;
     private bool _darkTheme;
+    private bool _cardThemeSelected;
     private readonly List<TextMate.Installation> _textMateInstallations = [];
     private readonly Dictionary<HighlightingColor, HighlightingBrush?> _lightHighlightingColors = [];
     private RegistryOptions? _textMateGrammars;
@@ -128,8 +129,9 @@ public sealed partial class CardStudioView : UserControl
         _dpiBox.TextChanged += (_, _) => SchedulePreview();
         _themeButton.Click += (_, _) =>
         {
-            Application.Current!.RequestedThemeVariant = ActualThemeVariant == ThemeVariant.Dark
-                ? ThemeVariant.Light : ThemeVariant.Dark;
+            _cardThemeSelected = true;
+            SetCardTheme(!_darkTheme);
+            if (!_previewBusy) RenderPreview();
         };
         _refreshButton.Click += async (_, _) => await RunPreviewAsync();
         this.FindControl<Button>("SampleButton")!.Click += (_, _) => LoadSample();
@@ -146,12 +148,14 @@ public sealed partial class CardStudioView : UserControl
         DetachedFromVisualTree += (_, _) =>
         {
             _previewTimer.Stop();
+            CloseAxamlCompletion();
             AssemblyLoadContext.Default.Resolving -= ResolveAssembly;
             _previewBitmap?.Dispose();
         };
 
         InitializeImageAssets();
         InitializeEditorShortcuts();
+        InitializeAxamlCompletion();
         LoadSample();
         if (OperatingSystem.IsBrowser())
         {
@@ -162,11 +166,13 @@ public sealed partial class CardStudioView : UserControl
         ActualThemeVariantChanged += (_, _) =>
         {
             UpdateEditorTheme();
+            if (!_cardThemeSelected) SetCardTheme(ActualThemeVariant == ThemeVariant.Dark);
             if (!_previewBusy) RenderPreview();
         };
         Loaded += async (_, _) =>
         {
             UpdateEditorTheme();
+            if (!_cardThemeSelected) SetCardTheme(ActualThemeVariant == ThemeVariant.Dark);
             await RestoreImageAssetsAsync();
             RenderPreview();
         };
@@ -174,10 +180,9 @@ public sealed partial class CardStudioView : UserControl
 
     private void UpdateEditorTheme()
     {
-        _darkTheme = ActualThemeVariant == ThemeVariant.Dark;
+        var editorDark = ActualThemeVariant == ThemeVariant.Dark;
         if (OperatingSystem.IsBrowser())
-            JSHost.GlobalThis.SetProperty("cardStudioDarkTheme", _darkTheme);
-        _themeButton.Content = _darkTheme ? "深色" : "浅色";
+            JSHost.GlobalThis.SetProperty("cardStudioDarkTheme", editorDark);
         if (OperatingSystem.IsBrowser())
         {
             foreach (var name in new[] { "XML", "C#" })
@@ -187,7 +192,7 @@ public sealed partial class CardStudioView : UserControl
                 {
                     _lightHighlightingColors.TryAdd(color, color.Foreground);
                     var original = _lightHighlightingColors[color];
-                    color.Foreground = _darkTheme && original is not null
+                    color.Foreground = editorDark && original is not null
                         ? new SimpleHighlightingBrush(Color.Parse(color.Name switch
                         {
                             "Comment" or "Preprocessor" => "#6A9955",
@@ -210,9 +215,16 @@ public sealed partial class CardStudioView : UserControl
         }
         else if (_textMateGrammars is not null)
         {
-            var theme = _textMateGrammars.LoadTheme(_darkTheme ? ThemeName.DarkPlus : ThemeName.LightPlus);
+            var theme = _textMateGrammars.LoadTheme(editorDark ? ThemeName.DarkPlus : ThemeName.LightPlus);
             foreach (var installation in _textMateInstallations) installation.SetTheme(theme);
         }
+    }
+
+    private void SetCardTheme(bool dark)
+    {
+        _darkTheme = dark;
+        _themeButton.Content = dark ? "深色" : "浅色";
+        _cardThemeScope.RequestedThemeVariant = dark ? ThemeVariant.Dark : ThemeVariant.Light;
     }
 
     private void SchedulePreview()
@@ -273,6 +285,7 @@ public sealed partial class CardStudioView : UserControl
                 }
 
                 (_compiledAssembly, _compiledViewType) = compiled;
+                AxamlCompletionService.RegisterAssembly(_compiledAssembly);
                 _compiledCodeKey = codeKey;
             }
 
@@ -333,6 +346,7 @@ public sealed partial class CardStudioView : UserControl
                 {
                     (_compiledAssembly, _compiledViewType) = RuntimeCodeCompiler.Compile(
                         axaml, _csharpEditor.Text, _viewModelEditor.Text);
+                    AxamlCompletionService.RegisterAssembly(_compiledAssembly);
                     _compiledCodeKey = codeKey;
                 }
 
@@ -680,6 +694,7 @@ public sealed partial class CardStudioView : UserControl
 
             var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(path));
             _localAssembly = assembly;
+            AxamlCompletionService.RegisterAssembly(assembly);
             Type[] types;
             try
             {
