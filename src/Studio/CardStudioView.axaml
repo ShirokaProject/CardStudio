@@ -8,6 +8,7 @@
   <UserControl.Styles>
     <Style Selector="Button.toolbar">
       <Setter Property="Height" Value="34" />
+      <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="MinHeight" Value="0" />
       <Setter Property="MinWidth" Value="0" />
       <Setter Property="Padding" Value="13,4" />
@@ -17,6 +18,8 @@
     <Style Selector="ComboBox.toolbar">
       <Setter Property="Height" Value="34" />
       <Setter Property="MinHeight" Value="0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="FontSize" Value="13" />
     </Style>
   </UserControl.Styles>
@@ -39,7 +42,8 @@
           <Button x:Name="OpenButton" Classes="toolbar" Content="打开" />
           <Button x:Name="SaveButton" Classes="toolbar" Content="保存" />
           <Button x:Name="RefreshButton" Classes="toolbar" Content="运行" />
-          <Button Classes="toolbar" Content="图片">
+          <Button x:Name="SampleButton" Classes="toolbar" Content="示例" />
+          <Button Classes="toolbar" Content="导入图片资源" Margin="15,0,0,0">
             <Button.Flyout><Flyout><StackPanel Width="320" Spacing="10">
               <TextBlock Text="临时图片资源" FontWeight="SemiBold" />
               <StackPanel Orientation="Horizontal" Spacing="8">
@@ -51,7 +55,6 @@
               <TextBlock x:Name="ImageAssetsHint" Text="保存在本机，下次打开仍可使用。" FontSize="11" TextWrapping="Wrap" />
             </StackPanel></Flyout></Button.Flyout>
           </Button>
-          <Button x:Name="SampleButton" Classes="toolbar" Content="示例" />
         </StackPanel>
 
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
@@ -60,16 +63,16 @@
           <ComboBox x:Name="ControlTypeCombo" Classes="toolbar" Width="125" IsEnabled="False" />
           <Button x:Name="InsertTypeButton" Classes="toolbar" Content="插入控件" IsEnabled="False" />
           <Button x:Name="ThemeButton" Classes="toolbar" Content="浅色" />
-          <TextBox x:Name="DpiBox" Width="64" Height="42" MinHeight="0" Text="192"
-                   Padding="0" FontSize="14" TextAlignment="Center"
-                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                   PlaceholderText="DPI" />
           <Button x:Name="CopyButton" Classes="toolbar" Content="复制 PNG" IsEnabled="False" />
           <Button x:Name="DownloadButton" Classes="toolbar" Width="36" Padding="8,4"
                   ToolTip.Tip="下载 PNG" IsEnabled="False">
             <PathIcon Width="18" Height="18"
                       Data="{x:Static icons:MaterialSymbols.Download}" />
           </Button>
+          <TextBox x:Name="DpiBox" Width="64" Height="34" MinHeight="0" Text="192"
+                   Padding="0" FontSize="14" TextAlignment="Center"
+                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                   PlaceholderText="DPI" />
         </StackPanel>
       </Grid>
     </Border>

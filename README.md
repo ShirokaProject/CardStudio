@@ -6,10 +6,6 @@ Avalonia 卡片调试器：编写 AXAML、C# 和可选 ViewModel，实时预览�
 
 [浏览器中在线使用 - card.shiroka.org](https://card.shiroka.org)
 
-图片菜单可导入、插入和清空图片资源；浏览器在本机保存资源，刷新后可继续使用。macOS 编辑器支持 ⌘C / ⌘V / ⌘F。
-
-AXAML 编辑器支持标签、属性、属性值和资源键补全；按 Ctrl/⌘+Space 可手动打开候选。
-
 ## 本地运行
 
 需要 .NET 10 SDK。
