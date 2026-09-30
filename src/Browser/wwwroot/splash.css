@@ -151,6 +151,9 @@
     --track: #3c4655;
   }
   .boot-mark { box-shadow: 0 12px 28px #0005; }
+  .preview-busy { background: rgba(23, 27, 36, 0.86); color: #c0ccdf; }
+  .preview-spinner circle { stroke: #3c4655; }
+  .preview-spinner path { stroke: #adc6ff; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -158,3 +161,8 @@
   .boot-progress-track div.is-loading { animation: none; }
   .preview-spinner path { animation: none; }
 }
+
+html[data-studio-theme="dark"] .preview-busy { background: rgba(23, 27, 36, .86); color: #c0ccdf; }
+html[data-studio-theme="dark"] .preview-spinner path { stroke: #adc6ff; }
+html[data-studio-theme="light"] .preview-busy { background: rgba(243, 245, 248, .86); color: #40516b; }
+html[data-studio-theme="light"] .preview-spinner path { stroke: #286fea; }

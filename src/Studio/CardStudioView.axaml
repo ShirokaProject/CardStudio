@@ -4,7 +4,7 @@
              xmlns:icons="using:Material3.Avalonia.Icons"
              xmlns:material="using:Material3.Avalonia.Controls"
              x:Class="CardStudio.CardStudioView"
-             Background="White">
+             Background="{DynamicResource StudioSurface}" Foreground="{DynamicResource StudioText}">
   <UserControl.Styles>
     <Style Selector="Button.toolbar">
       <Setter Property="Height" Value="34" />
@@ -21,7 +21,7 @@
     </Style>
   </UserControl.Styles>
   <Grid RowDefinitions="54,*,30">
-    <Border Grid.Row="0" BorderBrush="#E1E4E9" BorderThickness="0,0,0,1">
+    <Border Grid.Row="0" BorderBrush="{DynamicResource StudioOutline}" BorderThickness="0,0,0,1">
       <Grid Margin="16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="20">
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
           <Border Width="32" Height="32" CornerRadius="10" Background="#286FEA">
@@ -39,6 +39,18 @@
           <Button x:Name="OpenButton" Classes="toolbar" Content="打开" />
           <Button x:Name="SaveButton" Classes="toolbar" Content="保存" />
           <Button x:Name="RefreshButton" Classes="toolbar" Content="运行" />
+          <Button Classes="toolbar" Content="图片">
+            <Button.Flyout><Flyout><StackPanel Width="320" Spacing="10">
+              <TextBlock Text="临时图片资源" FontWeight="SemiBold" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="ImportImagesButton" Content="导入图片" />
+                <Button x:Name="ClearImagesButton" Content="清空" />
+              </StackPanel>
+              <ListBox x:Name="ImageAssetsList" Height="180" />
+              <Button x:Name="InsertImageButton" Content="插入到 AXAML 光标处" />
+              <TextBlock x:Name="ImageAssetsHint" Text="保存在本机，下次打开仍可使用。" FontSize="11" TextWrapping="Wrap" />
+            </StackPanel></Flyout></Button.Flyout>
+          </Button>
           <Button x:Name="SampleButton" Classes="toolbar" Content="示例" />
         </StackPanel>
 
@@ -55,7 +67,7 @@
           <Button x:Name="CopyButton" Classes="toolbar" Content="复制 PNG" IsEnabled="False" />
           <Button x:Name="DownloadButton" Classes="toolbar" Width="36" Padding="8,4"
                   ToolTip.Tip="下载 PNG" IsEnabled="False">
-            <PathIcon Width="18" Height="18" Foreground="White"
+            <PathIcon Width="18" Height="18"
                       Data="{x:Static icons:MaterialSymbols.Download}" />
           </Button>
         </StackPanel>
@@ -68,46 +80,46 @@
           <TextBlock Text="代码" FontSize="15" FontWeight="SemiBold"
                      VerticalAlignment="Center" />
           <TextBlock Grid.Column="1" Text="编辑后自动刷新" FontSize="12"
-                     Foreground="#748091" VerticalAlignment="Center" />
+                     Foreground="{DynamicResource StudioMuted}" VerticalAlignment="Center" />
         </Grid>
         <TabControl x:Name="EditorTabs" Grid.Row="1" TabStripPlacement="Bottom"
                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                    Background="White">
+                    Background="{DynamicResource StudioSurface}" Foreground="{DynamicResource StudioText}">
           <TabItem Header="AXAML" Height="40" VerticalContentAlignment="Center">
             <editor:TextEditor x:Name="CodeEditor" Margin="8,0,8,4"
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                      ShowLineNumbers="True"
                      FontFamily="Menlo, Consolas, monospace"
-                     FontSize="13" Background="White" />
+                     FontSize="13" Foreground="{DynamicResource StudioText}" Background="{DynamicResource StudioEditorSurface}" />
           </TabItem>
           <TabItem Header="C#" Height="40" VerticalContentAlignment="Center">
             <editor:TextEditor x:Name="CSharpEditor" Margin="8,0,8,4"
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                      ShowLineNumbers="True"
                      FontFamily="Menlo, Consolas, monospace"
-                     FontSize="13" Background="White" />
+                     FontSize="13" Foreground="{DynamicResource StudioText}" Background="{DynamicResource StudioEditorSurface}" />
           </TabItem>
           <TabItem Header="ViewModel（可选）" Height="40" VerticalContentAlignment="Center">
             <editor:TextEditor x:Name="ViewModelEditor" Margin="8,0,8,4"
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                      ShowLineNumbers="True"
                      FontFamily="Menlo, Consolas, monospace"
-                     FontSize="13" Background="White" />
+                     FontSize="13" Foreground="{DynamicResource StudioText}" Background="{DynamicResource StudioEditorSurface}" />
           </TabItem>
         </TabControl>
       </Grid>
 
-      <GridSplitter Grid.Column="1" Width="5" Background="#D9DEE7" />
+      <GridSplitter Grid.Column="1" Width="5" Background="{DynamicResource StudioSplitter}" />
 
       <Grid Grid.Column="2" RowDefinitions="Auto,*,Auto" MinHeight="0">
         <Grid Margin="20,14,20,8" ColumnDefinitions="*,Auto">
           <TextBlock Text="预览" FontSize="15" FontWeight="SemiBold"
                      VerticalAlignment="Center" />
           <TextBlock x:Name="PreviewMetaText" Grid.Column="1" Text="等待渲染"
-                     FontSize="12" Foreground="#748091" VerticalAlignment="Center" />
+                     FontSize="12" Foreground="{DynamicResource StudioMuted}" VerticalAlignment="Center" />
         </Grid>
         <Grid Grid.Row="1">
-          <Border Background="#F3F5F8" Padding="20" ClipToBounds="True">
+          <Border Background="{DynamicResource StudioPreviewSurface}" Padding="20" ClipToBounds="True">
             <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
               <ThemeVariantScope x:Name="CardThemeScope">
                 <ThemeVariantScope.Styles>
@@ -118,31 +130,31 @@
               </ThemeVariantScope>
             </Viewbox>
           </Border>
-          <Border x:Name="PreviewLoadingOverlay" IsVisible="False" Background="#DDF3F5F8">
+          <Border x:Name="PreviewLoadingOverlay" IsVisible="False" Background="{DynamicResource StudioBusySurface}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
               <material:CircularProgressIndicator Width="48" Height="48"
                                                   IsIndeterminate="True" IsWavy="True"
                                                   StrokeWidth="4" Amplitude="2" WaveCount="5"
-                                                  Foreground="#286FEA" Background="#D6E2F4"
+                                                  Foreground="{DynamicResource StudioPrimary}" Background="{DynamicResource StudioProgressTrack}"
                                                   HorizontalAlignment="Center" />
-              <TextBlock Text="正在编译并渲染…" FontSize="14" Foreground="#40516B" />
+              <TextBlock Text="正在编译并渲染…" FontSize="14" Foreground="{DynamicResource StudioBusyText}" />
             </StackPanel>
           </Border>
         </Grid>
         <Border x:Name="ErrorPanel" Grid.Row="2" IsVisible="False"
-                Padding="12,9" Background="#FFF0F0">
-          <TextBlock x:Name="ErrorText" Foreground="#B53443" FontSize="12"
+                Padding="12,9" Background="{DynamicResource StudioErrorSurface}">
+          <TextBlock x:Name="ErrorText" Foreground="{DynamicResource StudioErrorText}" FontSize="12"
                      TextWrapping="Wrap" MaxHeight="110" />
         </Border>
       </Grid>
     </Grid>
 
-    <Border Grid.Row="2" BorderBrush="#E1E4E9" BorderThickness="0,1,0,0">
+    <Border Grid.Row="2" BorderBrush="{DynamicResource StudioOutline}" BorderThickness="0,1,0,0">
       <Grid Margin="16,0" ColumnDefinitions="*,Auto">
         <TextBlock x:Name="StatusText" Text="准备就绪" FontSize="11"
-                   Foreground="#667386" VerticalAlignment="Center" />
+                   Foreground="{DynamicResource StudioMuted}" VerticalAlignment="Center" />
         <TextBlock x:Name="VersionText" Grid.Column="1" FontSize="11"
-                   Foreground="#8994A4" VerticalAlignment="Center" />
+                   Foreground="{DynamicResource StudioMuted}" VerticalAlignment="Center" />
       </Grid>
     </Border>
   </Grid>

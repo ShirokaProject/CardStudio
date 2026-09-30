@@ -30,8 +30,17 @@ internal static class RuntimeCodeCompiler
             {
                 public partial class {{typeName}}
                 {
-                    private void InitializeComponent() =>
-                        CardStudio.RuntimeXamlContext.Initialize((Avalonia.Controls.Control)this);
+                    private void InitializeComponent()
+                    {
+                        // Resolve the host at run time. Browser hosts can load a newer
+                        // CardStudio build alongside Avalonia metadata from an older pack.
+                        var host = System.Linq.Enumerable.First(
+                            System.AppDomain.CurrentDomain.GetAssemblies(),
+                            a => a.GetName().Name == "CardStudio");
+                        host.GetType("CardStudio.RuntimeXamlContext", throwOnError: true)!
+                            .GetMethod("Initialize")!
+                            .Invoke(null, new object[] { this });
+                    }
                 }
             }
             """;
@@ -89,25 +98,31 @@ internal static class RuntimeCodeCompiler
         }
 
         var references = new List<MetadataReference>();
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic))
+        // Compile against the executing assemblies. On-disk files may have changed
+        // since startup; earlier live compilations are outputs, not dependencies.
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsDynamic &&
+                        a != typeof(RuntimeCodeCompiler).Assembly &&
+                        !(a.GetName().Name?.StartsWith("CardStudio.Live.", StringComparison.Ordinal) ?? false))
+            .GroupBy(a => a.GetName().Name, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.OrderByDescending(a => a.GetName().Version).First());
+        foreach (var assembly in assemblies)
         {
-            string? path;
-            try { path = assembly.Location; }
-            catch { path = null; }
-            if (!string.IsNullOrEmpty(path) && File.Exists(path))
-            {
-                references.Add(MetadataReference.CreateFromFile(path));
-                continue;
-            }
-
             unsafe
             {
                 if (assembly.TryGetRawMetadata(out var pointer, out var length))
                 {
                     var module = ModuleMetadata.CreateFromMetadata((IntPtr)pointer, length);
                     references.Add(AssemblyMetadata.Create(module).GetReference());
+                    continue;
                 }
             }
+
+            string? path;
+            try { path = assembly.Location; }
+            catch { path = null; }
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                references.Add(MetadataReference.CreateFromFile(path));
         }
 
         return references;

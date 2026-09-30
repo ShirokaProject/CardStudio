@@ -1,7 +1,43 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:m3="using:Material3.Avalonia"
-             x:Class="CardStudio.App">
+             x:Class="CardStudio.App" RequestedThemeVariant="Default">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="StudioSurface">#FFFFFF</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioEditorSurface">#FFFFFF</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioPreviewSurface">#F3F5F8</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioText">#191C20</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioMuted">#667386</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioOutline">#E1E4E9</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioSplitter">#D9DEE7</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioBusySurface">#DDF3F5F8</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioBusyText">#40516B</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioPrimary">#286FEA</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioProgressTrack">#D6E2F4</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioErrorSurface">#FFF0F0</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioErrorText">#B53443</SolidColorBrush>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="StudioSurface">#111318</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioEditorSurface">#17191F</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioPreviewSurface">#0D1017</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioText">#E2E2E9</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioMuted">#ADB8C9</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioOutline">#343B46</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioSplitter">#343B46</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioBusySurface">#DD171B24</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioBusyText">#C0CCDF</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioPrimary">#ADC6FF</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioProgressTrack">#3C4655</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioErrorSurface">#422526</SolidColorBrush>
+          <SolidColorBrush x:Key="StudioErrorText">#FFB4AB</SolidColorBrush>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
   <Application.Styles>
     <FluentTheme />
     <m3:MaterialTheme SeedColor="#286FEA" />

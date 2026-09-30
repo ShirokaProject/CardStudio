@@ -29,6 +29,9 @@ public sealed partial class CardStudioView : UserControl
     private readonly Button _themeButton;
     private readonly Button _refreshButton;
     private bool _darkTheme;
+    private readonly List<TextMate.Installation> _textMateInstallations = [];
+    private readonly Dictionary<HighlightingColor, HighlightingBrush?> _lightHighlightingColors = [];
+    private RegistryOptions? _textMateGrammars;
     private readonly ComboBox _controlTypeCombo;
     private readonly Button _insertTypeButton;
     private readonly Button _copyButton;
@@ -74,12 +77,16 @@ public sealed partial class CardStudioView : UserControl
         {
             try
             {
-                var grammars = new RegistryOptions(ThemeName.LightPlus);
-                _codeEditor.InstallTextMate(grammars).SetGrammar(
+                var grammars = _textMateGrammars = new RegistryOptions(ThemeName.LightPlus);
+                var xmlInstallation = _codeEditor.InstallTextMate(grammars);
+                _textMateInstallations.Add(xmlInstallation);
+                xmlInstallation.SetGrammar(
                     grammars.GetScopeByLanguageId(grammars.GetLanguageByExtension(".xml").Id));
                 foreach (var editor in new[] { _csharpEditor, _viewModelEditor })
                 {
-                    editor.InstallTextMate(grammars).SetGrammar(
+                    var installation = editor.InstallTextMate(grammars);
+                    _textMateInstallations.Add(installation);
+                    installation.SetGrammar(
                         grammars.GetScopeByLanguageId(grammars.GetLanguageByExtension(".cs").Id));
                 }
             }
@@ -121,9 +128,8 @@ public sealed partial class CardStudioView : UserControl
         _dpiBox.TextChanged += (_, _) => SchedulePreview();
         _themeButton.Click += (_, _) =>
         {
-            _darkTheme = !_darkTheme;
-            _themeButton.Content = _darkTheme ? "深色" : "浅色";
-            if (!_previewBusy) RenderPreview();
+            Application.Current!.RequestedThemeVariant = ActualThemeVariant == ThemeVariant.Dark
+                ? ThemeVariant.Light : ThemeVariant.Dark;
         };
         _refreshButton.Click += async (_, _) => await RunPreviewAsync();
         this.FindControl<Button>("SampleButton")!.Click += (_, _) => LoadSample();
@@ -144,6 +150,8 @@ public sealed partial class CardStudioView : UserControl
             _previewBitmap?.Dispose();
         };
 
+        InitializeImageAssets();
+        InitializeEditorShortcuts();
         LoadSample();
         if (OperatingSystem.IsBrowser())
         {
@@ -151,7 +159,60 @@ public sealed partial class CardStudioView : UserControl
             _controlTypeCombo.IsVisible = false;
             _insertTypeButton.IsVisible = false;
         }
-        Loaded += (_, _) => RenderPreview();
+        ActualThemeVariantChanged += (_, _) =>
+        {
+            UpdateEditorTheme();
+            if (!_previewBusy) RenderPreview();
+        };
+        Loaded += async (_, _) =>
+        {
+            UpdateEditorTheme();
+            await RestoreImageAssetsAsync();
+            RenderPreview();
+        };
+    }
+
+    private void UpdateEditorTheme()
+    {
+        _darkTheme = ActualThemeVariant == ThemeVariant.Dark;
+        if (OperatingSystem.IsBrowser())
+            JSHost.GlobalThis.SetProperty("cardStudioDarkTheme", _darkTheme);
+        _themeButton.Content = _darkTheme ? "深色" : "浅色";
+        if (OperatingSystem.IsBrowser())
+        {
+            foreach (var name in new[] { "XML", "C#" })
+            {
+                var definition = HighlightingManager.Instance.GetDefinition(name);
+                foreach (var color in definition.NamedHighlightingColors)
+                {
+                    _lightHighlightingColors.TryAdd(color, color.Foreground);
+                    var original = _lightHighlightingColors[color];
+                    color.Foreground = _darkTheme && original is not null
+                        ? new SimpleHighlightingBrush(Color.Parse(color.Name switch
+                        {
+                            "Comment" or "Preprocessor" => "#6A9955",
+                            "AttributeName" => "#9CDCFE",
+                            "AttributeValue" or "String" or "Char" => "#CE9178",
+                            "MethodCall" => "#DCDCAA",
+                            "NumberLiteral" => "#B5CEA8",
+                            "StringInterpolation" => "#D4D4D4",
+                            "XmlTag" or "Keywords" or "Visibility" or "TypeKeywords" => "#569CD6",
+                            _ => "#C586C0"
+                        })) : original;
+                }
+            }
+            foreach (var editor in new[] { _codeEditor, _csharpEditor, _viewModelEditor })
+            {
+                var definition = editor == _codeEditor ? "XML" : "C#";
+                editor.SyntaxHighlighting = null;
+                editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition(definition);
+            }
+        }
+        else if (_textMateGrammars is not null)
+        {
+            var theme = _textMateGrammars.LoadTheme(_darkTheme ? ThemeName.DarkPlus : ThemeName.LightPlus);
+            foreach (var installation in _textMateInstallations) installation.SetTheme(theme);
+        }
     }
 
     private void SchedulePreview()

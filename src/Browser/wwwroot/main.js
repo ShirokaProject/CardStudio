@@ -1,3 +1,4 @@
+import './assets.js';
 import { waitForIntro, studioReady, studioFailed } from './splash.js';
 
 const previewBusy = document.getElementById('preview-busy');
@@ -34,6 +35,16 @@ Object.defineProperty(globalThis, 'cardStudioPngDownload', {
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
+});
+
+
+window.addEventListener("keydown", event => {
+  if (event.metaKey && event.key.toLowerCase() === "f" && document.activeElement?.closest("#out")) event.preventDefault();
+});
+
+Object.defineProperty(globalThis, "cardStudioDarkTheme", {
+  configurable: true,
+  set: value => { document.documentElement.dataset.studioTheme = value ? "dark" : "light"; }
 });
 
 await waitForIntro();
